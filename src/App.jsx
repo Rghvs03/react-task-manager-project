@@ -3,20 +3,18 @@ import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
 import TaskFilter from "./components/TaskFilter";
 import SearchBar from "./components/SearchBar";
-import "./App.css";
+import "./index.css";
 
 const LOCAL_STORAGE_KEY = "tasks";
 
 function App() {
-  const [tasks, setTasks] = useState([]);
+
+  const [tasks, setTasks] = useState(() => {
+    const storedTasks = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return storedTasks ? JSON.parse(storedTasks) : [];
+  });
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
-
-
-  useEffect(() => {
-    const storedTasks = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (storedTasks) setTasks(JSON.parse(storedTasks));
-  }, []);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(tasks));
@@ -42,6 +40,10 @@ function App() {
     );
   };
 
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
   const filteredTasks = tasks
     .filter((task) => {
       if (filter === "Pending") return !task.completed;
@@ -59,10 +61,11 @@ function App() {
       <TaskForm addTask={addTask} />
       <TaskFilter filter={filter} setFilter={setFilter} />
       <SearchBar search={search} setSearch={setSearch} />
-      <TaskList tasks={filteredTasks} toggleTask={toggleTask} />
-      <footer>
-        © 2025 Task Master. All rights reserved.
-      </footer>
+      <TaskList
+        tasks={filteredTasks}
+        toggleTask={toggleTask}
+        deleteTask={deleteTask}
+      />
     </div>
   );
 }

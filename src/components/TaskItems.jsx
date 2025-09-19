@@ -1,9 +1,6 @@
-function TaskItem({ task, toggleTask }) {
+function TaskItem({ task, toggleTask, deleteTask }) {
   return (
-    <div
-      className={`task-item${task.completed ? " completed" : ""}`}
-      onClick={() => toggleTask(task.id)}
-    >
+    <div className={`task-item${task.completed ? " completed" : ""}`}>
       <input
         type="checkbox"
         checked={task.completed}
@@ -13,6 +10,16 @@ function TaskItem({ task, toggleTask }) {
         <strong>{task.title}</strong>
         <span>{task.description}</span>
       </div>
+      <button
+        className="delete-btn"
+        onClick={(e) => {
+          e.stopPropagation();
+          deleteTask(task.id);
+        }}
+        title="Delete task"
+      >
+        &times;
+      </button>
     </div>
   );
 }
