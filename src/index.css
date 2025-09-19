@@ -165,6 +165,7 @@ footer {
     padding: 16px 4vw;
     margin: 5px;
     margin-top: 60px;
+    border-radius: 24px;
   }
   h1 {
     font-size: 1.6rem;
