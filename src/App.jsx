@@ -1,35 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import TaskForm from "./components/TaskForm";
+import TaskList from "./components/TaskList";
+import TaskFilter from "./components/TaskFilter";
+import SearchBar from "./components/SearchBar";
+import "./App.css";
+
+const LOCAL_STORAGE_KEY = "tasks";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [tasks, setTasks] = useState([]);
+  const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+
+
+  useEffect(() => {
+    const storedTasks = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedTasks) setTasks(JSON.parse(storedTasks));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(tasks));
+  }, [tasks]);
+
+  const addTask = (title, description) => {
+    setTasks([
+      ...tasks,
+      {
+        id: Date.now(),
+        title,
+        description,
+        completed: false,
+      },
+    ]);
+  };
+
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const filteredTasks = tasks
+    .filter((task) => {
+      if (filter === "Pending") return !task.completed;
+      if (filter === "Completed") return task.completed;
+      return true;
+    })
+    .filter((task) =>
+      task.title.toLowerCase().includes(search.toLowerCase())
+    );
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="container">
+      <h1>My Tasks</h1>
+      <p className="subtitle">Stay organized and productive.</p>
+      <TaskForm addTask={addTask} />
+      <TaskFilter filter={filter} setFilter={setFilter} />
+      <SearchBar search={search} setSearch={setSearch} />
+      <TaskList tasks={filteredTasks} toggleTask={toggleTask} />
+      <footer>
+        © 2025 Task Master. All rights reserved.
+      </footer>
+    </div>
+  );
 }
 
-export default App
+export default App;
